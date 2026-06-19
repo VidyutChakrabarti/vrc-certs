@@ -15,6 +15,13 @@ function unique(items) {
   return [...new Set(items)];
 }
 
+function hoursValue(item) {
+  // Treat missing or zero hours as 1 for data view calculations
+  if (item == null) return 1;
+  const h = item.hours;
+  return h == null || h === 0 ? 1 : h;
+}
+
 function providerMark(name) {
   if (name.includes('DeepLearning')) return 'DL';
   if (name.includes('Stanford')) return 'ST';
@@ -55,7 +62,7 @@ function fieldGroups() {
       return {
         field,
         count: items.length,
-        hours: items.reduce((sum, item) => sum + (item.hours || 0), 0),
+        hours: items.reduce((sum, item) => sum + hoursValue(item), 0),
         accent: palette[field] || '#52d053',
       };
     })
@@ -72,7 +79,7 @@ function providerGroups() {
       accent: providerAccent(item.issuer),
     };
     current.count += 1;
-    current.hours += item.hours || 0;
+    current.hours += hoursValue(item);
     map.set(item.issuer, current);
   });
   return [...map.values()].sort((a, b) => b.count - a.count || b.hours - a.hours);
@@ -92,7 +99,7 @@ function monthGroups() {
       hours: 0,
     };
     current.count += 1;
-    current.hours += item.hours || 0;
+    current.hours += hoursValue(item);
     map.set(key, current);
   });
   return [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
